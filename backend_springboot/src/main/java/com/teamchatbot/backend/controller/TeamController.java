@@ -1,7 +1,9 @@
 package com.teamchatbot.backend.controller;
 
 import com.teamchatbot.backend.entity.Team;
+import com.teamchatbot.backend.entity.User;
 import com.teamchatbot.backend.service.TeamService;
+import com.teamchatbot.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +13,11 @@ import java.util.List;
 public class TeamController {
 
     private final TeamService teamService;
+    private final UserService userService;
 
-    public TeamController(TeamService teamService) {
+    public TeamController(TeamService teamService, UserService userService) {
         this.teamService = teamService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -41,6 +45,11 @@ public class TeamController {
     @GetMapping("/{id}")
     public Team getTeamById(@PathVariable Long id) {
         return teamService.getTeamById(id);
+    }
+
+    @GetMapping("/{id}/users")
+    public List<User> getUsersByTeam(@PathVariable Long id) {
+        return userService.getUsersByTeamId(id);
     }
 
 
