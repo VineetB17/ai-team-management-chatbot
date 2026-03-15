@@ -2,8 +2,10 @@ package com.teamchatbot.backend.controller;
 
 import com.teamchatbot.backend.dto.CreateUserRequest;
 import com.teamchatbot.backend.dto.TransferUserRequest;
+import com.teamchatbot.backend.dto.UpdateUserRequest;
 import com.teamchatbot.backend.entity.User;
 import com.teamchatbot.backend.service.UserService;
+import com.teamchatbot.backend.entity.Team;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -41,5 +43,20 @@ public class UserController {
 
         return userService.transferUser(id, request.getTeamId());
     }
+
+    @GetMapping("/{id}/team")
+    public Team getTeamOfUser(@PathVariable Long id) {
+        return userService.getTeamOfUser(id);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(
+            @PathVariable Long id,
+            @RequestBody UpdateUserRequest request) {
+
+        return userService.updateUser(id, request);
+    }
+
+
 
 }

@@ -7,6 +7,7 @@ import com.teamchatbot.backend.repository.UserRepository;
 import com.teamchatbot.backend.repository.TeamRepository;
 import com.teamchatbot.backend.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import com.teamchatbot.backend.dto.UpdateUserRequest;
 
 import java.util.List;
 
@@ -68,5 +69,32 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public Team getTeamOfUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+
+        return user.getTeam();
+    }
+
+    public User updateUser(Long userId, UpdateUserRequest request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+
+        if (request.getIsActive() != null) {
+            user.setIsActive(request.getIsActive());
+        }
+
+        return userRepository.save(user);
+    }
+
 
 }

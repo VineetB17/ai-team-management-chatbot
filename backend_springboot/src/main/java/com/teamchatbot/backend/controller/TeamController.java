@@ -1,10 +1,12 @@
 package com.teamchatbot.backend.controller;
 
+import com.teamchatbot.backend.dto.CreateTeamRequest;
 import com.teamchatbot.backend.entity.Team;
 import com.teamchatbot.backend.entity.User;
 import com.teamchatbot.backend.service.TeamService;
 import com.teamchatbot.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -20,9 +22,9 @@ public class TeamController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public Team createTeam(@RequestBody Team team) {
-        return teamService.createTeam(team.getTeamName());
+    @PostMapping("/create")
+    public Team createTeam(@RequestBody CreateTeamRequest request) {
+        return teamService.createTeam(request);
     }
 
 

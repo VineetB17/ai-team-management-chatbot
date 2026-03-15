@@ -1,9 +1,13 @@
 package com.teamchatbot.backend.service;
 
+import com.teamchatbot.backend.dto.CreateTeamRequest;
 import com.teamchatbot.backend.entity.Team;
+import com.teamchatbot.backend.entity.User;
 import com.teamchatbot.backend.exception.ResourceNotFoundException;
 import com.teamchatbot.backend.repository.TeamRepository;
+import com.teamchatbot.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,15 +15,32 @@ import java.util.List;
 public class TeamService {
 
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
-    public TeamService(TeamRepository teamRepository) {
+    public TeamService(TeamRepository teamRepository, UserRepository userRepository) {
         this.teamRepository = teamRepository;
+        this.userRepository = userRepository;
     }
 
-    public Team createTeam(String teamName) {
-        Team team = new Team(teamName);
-        return teamRepository.save(team);
+    @Transactional
+    public Team createTeam(CreateTeamRequest request) {
+
+        Team team = new Team();
+        team.setTeamName(request.getTeamName());
+        team.setIsActive(true);
+
+        Team savedTeam = teamRepository.save(team);
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setIsActive(true);
+        user.setTeam(savedTeam);
+
+        userRepository.save(user);
+
+        return savedTeam;
     }
+
 
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
