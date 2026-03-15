@@ -54,4 +54,19 @@ public class UserService {
         return userRepository.findByTeamTeamId(teamId);
     }
 
+    public User transferUser(Long userId, Long newTeamId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+
+        Team team = teamRepository.findById(newTeamId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Team not found with id: " + newTeamId));
+
+        user.setTeam(team);
+
+        return userRepository.save(user);
+    }
+
 }

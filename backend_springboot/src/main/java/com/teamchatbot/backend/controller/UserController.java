@@ -1,6 +1,7 @@
 package com.teamchatbot.backend.controller;
 
 import com.teamchatbot.backend.dto.CreateUserRequest;
+import com.teamchatbot.backend.dto.TransferUserRequest;
 import com.teamchatbot.backend.entity.User;
 import com.teamchatbot.backend.service.UserService;
 
@@ -32,4 +33,13 @@ public class UserController {
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
+
+    @PutMapping("/{id}/transfer")
+    public User transferUser(
+            @PathVariable Long id,
+            @RequestBody TransferUserRequest request) {
+
+        return userService.transferUser(id, request.getTeamId());
+    }
+
 }
