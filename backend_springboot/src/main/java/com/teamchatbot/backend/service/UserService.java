@@ -8,6 +8,7 @@ import com.teamchatbot.backend.repository.TeamRepository;
 import com.teamchatbot.backend.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import com.teamchatbot.backend.dto.UpdateUserRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,19 +23,30 @@ public class UserService {
         this.teamRepository = teamRepository;
     }
 
+    @Transactional
     public User createUser(CreateUserRequest request) {
-
-        Team team = teamRepository.findById(request.getTeamId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Team not found with id: " + request.getTeamId()));
 
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setTeam(team);
         user.setIsActive(true);
+
+        if (request.getTeamId() != null) {
+
+            Team team = teamRepository.findById(request.getTeamId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Team not found"));
+
+            user.setTeam(team);
+
+            if (!team.getIsActive()) {
+                team.setIsActive(true);
+                teamRepository.save(team);
+            }
+        }
 
         return userRepository.save(user);
     }
+
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -76,6 +88,10 @@ public class UserService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found with id: " + userId));
 
+        if (user.getTeam() == null) {
+            throw new ResourceNotFoundException("User is not assigned to a team");
+        }
+
         return user.getTeam();
     }
 
@@ -95,6 +111,26 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+
+        Team team = user.getTeam();
+
+        userRepository.delete(user);
+
+        long remainingUsers = userRepository.countByTeamTeamId(team.getTeamId());
+
+        if (remainingUsers == 0) {
+            team.setIsActive(false);
+            teamRepository.save(team);
+        }
+    }
+
 
 
 }
