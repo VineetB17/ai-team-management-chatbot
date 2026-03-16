@@ -9,5 +9,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByTeamTeamId(Long teamId);
     long countByTeamTeamId(Long teamId);
+    long countByTeamTeamIdAndIsActiveTrue(Long teamId);
 
 }

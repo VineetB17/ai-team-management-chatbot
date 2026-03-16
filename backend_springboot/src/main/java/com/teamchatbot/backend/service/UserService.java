@@ -3,6 +3,7 @@ package com.teamchatbot.backend.service;
 import com.teamchatbot.backend.dto.CreateUserRequest;
 import com.teamchatbot.backend.entity.User;
 import com.teamchatbot.backend.entity.Team;
+import com.teamchatbot.backend.exception.BadRequestException;
 import com.teamchatbot.backend.repository.UserRepository;
 import com.teamchatbot.backend.repository.TeamRepository;
 import com.teamchatbot.backend.exception.ResourceNotFoundException;
@@ -67,20 +68,48 @@ public class UserService {
         return userRepository.findByTeamTeamId(teamId);
     }
 
+    @Transactional
     public User transferUser(Long userId, Long newTeamId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + userId));
+                        new ResourceNotFoundException("User not found"));
 
-        Team team = teamRepository.findById(newTeamId)
+        if (user.getTeam().getTeamId().equals(newTeamId)) {
+            throw new BadRequestException("User already belongs to this team");
+
+        }
+
+
+        Team oldTeam = user.getTeam();
+
+        Team newTeam = teamRepository.findById(newTeamId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Team not found with id: " + newTeamId));
+                        new ResourceNotFoundException("Team not found"));
 
-        user.setTeam(team);
+        user.setTeam(newTeam);
+        userRepository.save(user);
 
-        return userRepository.save(user);
+        if (oldTeam != null) {
+
+            long remainingUsers = userRepository.countByTeamTeamId(oldTeam.getTeamId());
+
+            if (remainingUsers == 0) {
+                oldTeam.setIsActive(false);
+                teamRepository.save(oldTeam);
+            }
+        }
+
+        if (!newTeam.getIsActive()) {
+            newTeam.setIsActive(true);
+            teamRepository.save(newTeam);
+        }
+
+        return user;
     }
+
+
+
 
     public Team getTeamOfUser(Long userId) {
 
@@ -112,24 +141,59 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @Transactional
-    public void deleteUser(Long userId) {
+    public User deactivateUser(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setIsActive(false);
 
         Team team = user.getTeam();
 
-        userRepository.delete(user);
+        if (team != null) {
 
-        long remainingUsers = userRepository.countByTeamTeamId(team.getTeamId());
+            long activeUsers = userRepository.countByTeamTeamIdAndIsActiveTrue(team.getTeamId());
 
-        if (remainingUsers == 0) {
-            team.setIsActive(false);
+            if (activeUsers == 0) {
+                team.setIsActive(false);
+                teamRepository.save(team);
+            }
+        }
+
+
+        return userRepository.save(user);
+    }
+
+    public User activateUser(Long userId) {
+
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getIsActive()) {
+            throw new IllegalStateException("User is already active");
+        }
+
+        user.setIsActive(true);
+
+        Team team = user.getTeam();
+
+
+
+        if (team != null && !team.getIsActive()) {
+            team.setIsActive(true);
             teamRepository.save(team);
         }
+
+        return userRepository.save(user);
     }
+
+
+
+
+
+
+
 
 
 

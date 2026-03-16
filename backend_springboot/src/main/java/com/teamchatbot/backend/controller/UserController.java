@@ -57,11 +57,17 @@ public class UserController {
         return userService.updateUser(id, request);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return "User deleted successfully";
+    @PutMapping("/{id}/deactivate")
+    public User deactivateUser(@PathVariable Long id) {
+        return userService.deactivateUser(id);
     }
+
+    @PutMapping("/{id}/activate")
+    public User activateUser(@PathVariable Long id) {
+        return userService.activateUser(id);
+    }
+
+
 
 
 

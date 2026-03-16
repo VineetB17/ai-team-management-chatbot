@@ -1,5 +1,7 @@
 package com.teamchatbot.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,7 +18,10 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "team_id")
+    @JsonIgnoreProperties("users")
+
     private Team team;
+
 
     public User() {}
 
@@ -46,5 +51,20 @@ public class User {
 
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+
+
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }

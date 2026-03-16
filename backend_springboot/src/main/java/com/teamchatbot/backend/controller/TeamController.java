@@ -54,6 +54,15 @@ public class TeamController {
         return userService.getUsersByTeamId(id);
     }
 
+    @DeleteMapping("/{id}")
+    public String deleteTeam(@PathVariable Long id) {
+
+        teamService.deleteTeam(id);
+
+        return "Team deleted successfully";
+    }
+
+
 
 
 }
