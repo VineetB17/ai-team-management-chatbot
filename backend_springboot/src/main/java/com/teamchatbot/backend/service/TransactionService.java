@@ -97,6 +97,11 @@ public class TransactionService {
         return transactionRepository.findTopTeams(pageable);
     }
 
+    public List<TransactionData> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
+
+
 
 
 

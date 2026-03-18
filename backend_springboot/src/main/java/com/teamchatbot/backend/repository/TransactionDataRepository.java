@@ -50,5 +50,8 @@ ORDER BY SUM(t.dataUsedMb) DESC
 """)
     List<TopTeamDTO> findTopTeams(Pageable pageable);
 
+    List<TransactionData> findAll();
+
+
 
 }

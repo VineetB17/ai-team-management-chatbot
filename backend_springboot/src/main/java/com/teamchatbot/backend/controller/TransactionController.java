@@ -4,6 +4,7 @@ import com.teamchatbot.backend.dto.CreateTransactionRequest;
 import com.teamchatbot.backend.entity.TransactionData;
 import com.teamchatbot.backend.service.TransactionService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,13 @@ public class TransactionController {
     public Double getTotalDataByTeam(@PathVariable Long teamId) {
         return transactionService.getTotalDataByTeam(teamId);
     }
+
+
+    @GetMapping
+    public ResponseEntity<List<TransactionData>> getAllTransactions() {
+        return ResponseEntity.ok(transactionService.getAllTransactions());
+    }
+
 
 
 
